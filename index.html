@@ -458,17 +458,17 @@ async function generar() {
 Genera el entregable completo con todo el contenido desarrollado (no solo el esquema). Incluye contenido real en cada sección, ejemplos de citas correctas en el formato indicado, y al final todos los extras solicitados claramente diferenciados con encabezados. Sé detallado y profesional.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const GEMINI_KEY = 'AIzaSyAQ.Ab8RN6K1k7ysdW5g8cxH_E2k1uOY-8ObwEGfxkIHRpzP9cR8qQ';
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 2048, temperature: 0.7 }
       })
     });
     const data = await res.json();
-    const text = data.content?.map(b => b.text || '').join('') || 'No se pudo generar el entregable.';
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No se pudo generar el entregable.';
     resultBody.textContent = text;
     document.getElementById('s3').classList.add('done');
   } catch (e) {
